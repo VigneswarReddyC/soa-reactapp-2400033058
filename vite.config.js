@@ -4,5 +4,5 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()], 
-  base: "https://github.com/VigneswarReddyC/soa-reactapp-2400033058"
+  base: "/soa-reactapp-2400033058"
 })
