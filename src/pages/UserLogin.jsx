@@ -3,8 +3,8 @@ import axios from 'axios'
 
 function UserLogin() {
   const [loginData, setLoginData] = useState({ email: '', password: '' })
-  const [message,setMessage]=useState("")
-  const [error,setError]=useState("")
+  const [message,setMessage]= useState("")
+  const [error,setError] = useState("")
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -13,37 +13,32 @@ function UserLogin() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setMessage('')
+    setError('')
 
     try {
       const response = await axios.post('http://localhost:8001/user/login', loginData)
 
-      if (response.status === 200) 
-      {
+      if (response.status === 200) {
         console.log('Login successful:', response.data)
-        setMessage("Login Success")
-       // alert('Login successful')
-      } else 
-      {
+        setError('')
+        setMessage('Login Success')
+      } else {
         console.error('Login failed:', response)
-        //alert('Login failed')
-        setError("Login Failed")
+        setMessage('')
+        setError('Login Failed')
       }
     } catch (error) {
-      if (error.response) //running backend but error in backend
-        {
-        console.error('Error in response:', error.response.data)
-        //alert(error.response.data?.message || 'Error in response')
-        setError(error.response.data?.message || 'Error in response')
-      } 
-       else if (error.request) //backend not running or not reachable network error
-      {
-        console.error('Error in request:', error.request)
-        //alert('Error in request')
-        setError('Error in request')
+      setMessage('')
+
+      if (error.response?.status === 401) {
+        setError(error.response.data?.message || error.response.data || 'Invalid email or password')
+      } else if (error.response?.status === 500) {
+        setError('Internal Server Error')
+      } else if (error.request) {
+        setError('Network Error - Server not responding')
       } else {
-        console.error('Error:', error.message)
-        //alert('Something went wrong')
-        setError('Something went wrong')
+        setError('Bad Request - Check your input')
       }
     }
   }
@@ -52,11 +47,11 @@ function UserLogin() {
     <section className="form-page">
       <form className="auth-form" onSubmit={handleSubmit}>
         <div>
-          {
-            message ? <p>{message}</p>
-           : <p>{error}</p>
-          }
-          
+          {message ? (
+            <p style={{ color: 'green' }}>{message}</p>
+          ) : error ? (
+            <p style={{ color: 'red' }}>{error}</p>
+          ) : null}
           <h1>Login</h1>
           <p className="form-description">Sign in with your account details.</p>
         </div>
